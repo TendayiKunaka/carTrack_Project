@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Cars - Vehicle Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(90deg, #2c3e50 0%, #4ca1af 100%);
+            color: white;
+            padding: 20px 0;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: #4ca1af;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #4ca1af;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3d8b99;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #4ca1af;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            background: white;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #7f8c8d;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            color: #4ca1af;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #4ca1af;
+            outline: none;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-img {
+            height: 200px;
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 50px;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: #7f8c8d;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .user-type-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .user-type-btn {
+            padding: 15px 30px;
+            background: white;
+            border: 2px solid #4ca1af;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .user-type-btn:hover {
+            background: #4ca1af;
+            color: white;
+        }
+
+        .user-type-btn.active {
+            background: #4ca1af;
+            color: white;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4ca1af;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>City Cars</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#" onclick="showPage('home')">Home</a>
+                    <a href="#" onclick="showPage('search')">Search</a>
+                    <a href="#" onclick="showPage('services')">Services</a>
+                    <a href="#" onclick="showPage('about')">About</a>
+                </div>
+                <div class="auth-buttons">
+                    <button class="btn btn-outline" onclick="showPage('login')">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                    <button class="btn btn-primary" onclick="showPage('register')">
+                        <i class="fas fa-user-plus"></i> Register
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="hero">
+                <h1>Manage Your Vehicles With Ease</h1>
+                <p>City Cars provides a comprehensive platform for vehicle registration, ticket management, and financial services for car owners.</p>
+                <button class="btn btn-primary" onclick="showPage('search')">
+                    <i class="fas fa-search"></i> Search for a Vehicle
+                </button>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-car-side"></i>
+                    </div>
+                    <h3>Vehicle Search</h3>
+                    <p>Search for any vehicle and view its complete history, including accidents, ownership, and tickets.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3>Ticket Management</h3>
+                    <p>Register your vehicles, dispute tickets, and keep track of all your parking and violation records.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Financial Services</h3>
+                    <p>Borrow money when your credit is low and manage your balance with our integrated financial system.</p>
+                </div>
+            </div>
+
+            <div class="user-type-selector">
+                <div class="user-type-btn" onclick="showPage('police-login')">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Police</h3>
+                    <p>Issue tickets and upload evidence</p>
+                </div>
+                <div class="user-type-btn" onclick="showPage('parking-login')">
+                    <i class="fas fa-parking"></i>
+                    <h3>Parking Attendant</h3>
+                    <p>Manage parking sessions and tickets</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Page -->
+        <div id="search" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Search for a Vehicle</h2>
+                <div class="form-group">
+                    <label for="plate-number">License Plate Number</label>
+                    <input type="text" id="plate-number" class="form-control" placeholder="Enter plate number">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="searchVehicle()">
+                    <i class="fas fa-search"></i> Search Vehicle
+                </button>
+            </div>
+
+            <div id="search-results" style="display: none;">
+                <h2 style="text-align: center; margin: 30px 0;">Vehicle Details</h2>
+                <div class="card">
+                    <div class="card-img">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 id="vehicle-make-model">Toyota Camry 2020</h3>
+                        <p id="vehicle-plate">Plate: ABC-123</p>
+                        <p id="vehicle-color">Color: Blue</p>
+                        <p id="vehicle-mileage">Mileage: 45,000 km</p>
+                        <p id="vehicle-expiry">Road Worthiness Expiry: Dec 2024</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 20px;">Vehicle History</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-content">
+                            <h3><i class="fas fa-crash"></i> Accidents</h3>
+                            <p id="accidents-count">No accidents recorded</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <h3><i class="fas fa-history"></i> Ownership History</h3>
+                            <p id="ownership-details">2 previous owners</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <h3><i class="fas fa-ticket-alt"></i> Tickets</h3>
+                            <p id="tickets-count">3 unpaid tickets</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <h3><i class="fas fa-parking"></i> Parking Sessions</h3>
+                            <p id="parking-sessions">15 sessions in last month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="login" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Login to Your Account</h2>
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" class="form-control" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="loginUser()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <p style="text-align: center; margin-top: 20px;">
+                    Don't have an account? <a href="#" onclick="showPage('register')" style="color: #4ca1af;">Register here</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="register" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Create an Account</h2>
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" class="form-control" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" class="form-control" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="reg-fullname">Full Name</label>
+                    <input type="text" id="reg-fullname" class="form-control" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="reg-phone">Phone Number</label>
+                    <input type="tel" id="reg-phone" class="form-control" placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" class="form-control" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm-password">Confirm Password</label>
+                    <input type="password" id="reg-confirm-password" class="form-control" placeholder="Confirm your password">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="registerUser()">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+                <p style="text-align: center; margin-top: 20px;">
+                    Already have an account? <a href="#" onclick="showPage('login')" style="color: #4ca1af;">Login here</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Police Login Page -->
+        <div id="police-login" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Police Officer Login</h2>
+                <div class="form-group">
+                    <label for="police-badge">Badge Number</label>
+                    <input type="text" id="police-badge" class="form-control" placeholder="Enter your badge number">
+                </div>
+                <div class="form-group">
+                    <label for="police-password">Password</label>
+                    <input type="password" id="police-password" class="form-control" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="loginPolice()">
+                    <i class="fas fa-sign-in-alt"></i> Login as Police Officer
+                </button>
+            </div>
+        </div>
+
+        <!-- Parking Attendant Login Page -->
+        <div id="parking-login" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Parking Attendant Login</h2>
+                <div class="form-group">
+                    <label for="parking-employee">Employee ID</label>
+                    <input type="text" id="parking-employee" class="form-control" placeholder="Enter your employee ID">
+                </div>
+                <div class="form-group">
+                    <label for="parking-password">Password</label>
+                    <input type="password" id="parking-password" class="form-control" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="loginParking()">
+                    <i class="fas fa-sign-in-alt"></i> Login as Parking Attendant
+                </button>
+            </div>
+        </div>
+
+        <!-- User Dashboard Page -->
+        <div id="dashboard" class="page">
+            <h2 style="text-align: center; margin: 20px 0;">User Dashboard</h2>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <i class="fas fa-car" style="font-size: 24px; color: #4ca1af;"></i>
+                    <div class="stat-number" id="vehicle-count">2</div>
+                    <p>Registered Vehicles</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-ticket-alt" style="font-size: 24px; color: #4ca1af;"></i>
+                    <div class="stat-number" id="ticket-count">3</div>
+                    <p>Outstanding Tickets</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-money-bill-wave" style="font-size: 24px; color: #4ca1af;"></i>
+                    <div class="stat-number" id="balance-amount">$125.50</div>
+                    <p>Available Balance</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-credit-card" style="font-size: 24px; color: #4ca1af;"></i>
+                    <div class="stat-number" id="loan-amount">$20.00</div>
+                    <p>Loan Balance</p>
+                </div>
+            </div>
+
+            <div class="user-type-selector">
+                <div class="user-type-btn active" onclick="showUserSection('vehicles')">
+                    <i class="fas fa-car"></i>
+                    <h3>My Vehicles</h3>
+                </div>
+                <div class="user-type-btn" onclick="showUserSection('tickets')">
+                    <i class="fas fa-ticket-alt"></i>
+                    <h3>My Tickets</h3>
+                </div>
+                <div class="user-type-btn" onclick="showUserSection('finance')">
+                    <i class="fas fa-dollar-sign"></i>
+                    <h3>Finance</h3>
+                </div>
+            </div>
+
+            <div id="user-vehicles" class="user-section">
+                <h3 style="margin: 20px 0;">My Vehicles</h3>
+                <button class="btn btn-primary" onclick="showPage('add-vehicle')">
+                    <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-img" style="background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Toyota Camry</h3>
+                            <p>Plate: ABC-123</p>
+                            <p>Year: 2020 | Color: Blue</p>
+                            <p>Mileage: 45,000 km</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-img" style="background: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Honda Civic</h3>
+                            <p>Plate: XYZ-789</p>
+                            <p>Year: 2018 | Color: Red</p>
+                            <p>Mileage: 62,000 km</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user-tickets" class="user-section" style="display: none;">
+                <h3 style="margin: 20px 0;">My Tickets</h3>
+
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Parking Violation</h3>
+                        <p><strong>Location:</strong> Downtown Main St.</p>
+                        <p><strong>Amount:</strong> $35.00</p>
+                        <p><strong>Status:</strong> Unpaid</p>
+                        <button class="btn btn-primary" style="margin-top: 10px;">
+                            <i class="fas fa-question-circle"></i> Dispute Ticket
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="user-finance" class="user-section" style="display: none;">
+                <h3 style="margin: 20px 0;">Financial Services</h3>
+
+                <div class="card">
+                    <div class="card-content">
+                        <h3>Borrow Money</h3>
+                        <p>You can borrow up to $20 when your balance is low.</p>
+                        <div class="form-group">
+                            <label for="loan-amount">Amount to Borrow</label>
+                            <input type="number" id="loan-amount" class="form-control" placeholder="Enter amount" max="20">
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-hand-holding-usd"></i> Request Loan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Vehicle Page -->
+        <div id="add-vehicle" class="page">
+            <div class="form-container">
+                <h2 class="form-title">Add a Vehicle</h2>
+                <div class="form-group">
+                    <label for="vehicle-plate">License Plate Number</label>
+                    <input type="text" id="vehicle-plate" class="form-control" placeholder="Enter plate number">
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-make">Make</label>
+                    <input type="text" id="vehicle-make" class="form-control" placeholder="Enter vehicle make">
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-model">Model</label>
+                    <input type="text" id="vehicle-model" class="form-control" placeholder="Enter vehicle model">
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-year">Year</label>
+                    <input type="number" id="vehicle-year" class="form-control" placeholder="Enter year">
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-color">Color</label>
+                    <input type="text" id="vehicle-color" class="form-control" placeholder="Enter color">
+                </div>
+                <div class="form-group">
+                    <label for="vehicle-mileage">Current Mileage</label>
+                    <input type="number" id="vehicle-mileage" class="form-control" placeholder="Enter mileage">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="addVehicle()">
+                    <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+            </div>
+        </div>
+
+        <!-- Services Page -->
+        <div id="services" class="page">
+            <h2 style="text-align: center; margin: 20px 0;">Our Services</h2>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Vehicle Search</h3>
+                    <p>Look up any vehicle by license plate to see its complete history, including accidents, ownership records, and ticket history.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <h3>Vehicle Registration</h3>
+                    <p>Register your vehicles with the city and keep all your documentation in one place for easy access.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3>Ticket Management</h3>
+                    <p>View, pay, or dispute parking and traffic tickets through our convenient online platform.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-money-check-alt"></i>
+                    </div>
+                    <h3>Financial Services</h3>
+                    <p>Borrow money when your balance is low to pay for parking, tickets, or other vehicle-related expenses.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="about" class="page">
+            <h2 style="text-align: center; margin: 20px 0;">About City Cars</h2>
+
+            <div class="card">
+                <div class="card-content">
+                    <h3>Our Mission</h3>
+                    <p>City Cars aims to simplify vehicle management for residents, police officers, and parking attendants through a unified platform. We provide transparency in vehicle history, streamline ticket management, and offer financial flexibility when needed.</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-content">
+                    <h3>How It Works</h3>
+                    <p>Our system integrates with city databases to provide accurate vehicle information. Users can register their vehicles, search for any vehicle's history, manage tickets, and access small loans for vehicle-related expenses. Police and parking attendants can issue tickets with photo evidence directly through the system.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 City Cars - Vehicle Management System. All rights reserved.</p>
+            <p>Designed to make urban vehicle management simpler and more efficient.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Page navigation functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show the selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function showUserSection(sectionId) {
+            // Hide all user sections
+            document.querySelectorAll('.user-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.user-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show the selected section and activate the button
+            document.getElementById('user-' + sectionId).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // Simulated functions for form submissions
+        function searchVehicle() {
+            const plateNumber = document.getElementById('plate-number').value;
+            if (plateNumber) {
+                // In a real application, this would call your API endpoint
+                document.getElementById('search-results').style.display = 'block';
+
+                // Simulate API response
+                document.getElementById('vehicle-make-model').textContent = 'Toyota Camry 2020';
+                document.getElementById('vehicle-plate').textContent = 'Plate: ' + plateNumber;
+                document.getElementById('vehicle-color').textContent = 'Color: Blue';
+                document.getElementById('vehicle-mileage').textContent = 'Mileage: 45,000 km';
+                document.getElementById('vehicle-expiry').textContent = 'Road Worthiness Expiry: Dec 2024';
+
+                document.getElementById('accidents-count').textContent = 'No accidents recorded';
+                document.getElementById('ownership-details').textContent = '2 previous owners';
+                document.getElementById('tickets-count').textContent = '3 unpaid tickets';
+                document.getElementById('parking-sessions').textContent = '15 sessions in last month';
+            } else {
+                alert('Please enter a license plate number');
+            }
+        }
+
+        function registerUser() {
+            // In a real application, this would call your API endpoint
+            alert('Registration successful! You can now login.');
+            showPage('login');
+        }
+
+        function loginUser() {
+            // In a real application, this would call your API endpoint
+            showPage('dashboard');
+        }
+
+        function loginPolice() {
+            // In a real application, this would call your API endpoint
+            alert('Police login successful! This would redirect to police dashboard.');
+        }
+
+        function loginParking() {
+            // In a real application, this would call your API endpoint
+            alert('Parking attendant login successful! This would redirect to parking dashboard.');
+        }
+
+        function addVehicle() {
+            // In a real application, this would call your API endpoint
+            alert('Vehicle added successfully!');
+            showPage('dashboard');
+        }
+    </script>
+</body>
+</html>

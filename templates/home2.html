@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Cars - Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(90deg, #2c3e50 0%, #4ca1af 100%);
+            color: white;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+        }
+
+        .logo i {
+            color: #4ca1af;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            padding: 0 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #4ca1af;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3d8b99;
+            transform: translateY(-2px);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 50px;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .card p {
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #4ca1af;
+            color: #4ca1af;
+        }
+
+        .btn-outline:hover {
+            background: #4ca1af;
+            color: white;
+        }
+
+        .no-vehicles {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .no-vehicles i {
+            font-size: 60px;
+            color: #ced4da;
+            margin-bottom: 15px;
+        }
+
+        .no-vehicles p {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            min-width: 180px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>City Cars</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#"><i class="fas fa-home"></i> Home</a>
+                    <a href="#"><i class="fas fa-car"></i> My Vehicles</a>
+                    <a href="#"><i class="fas fa-ticket-alt"></i> Tickets</a>
+                    <a href="#"><i class="fas fa-user"></i> Profile</a>
+                </div>
+            </nav>
+        </header>
+
+        <div class="content">
+            <h1 class="page-title">
+                <i class="fas fa-car"></i>
+                My Vehicles
+            </h1>
+
+            <button class="btn btn-primary" id="addVehicleBtn">
+                <i class="fas fa-plus"></i> Add Vehicle
+            </button>
+
+            <div class="filters">
+                <select class="filter-select" id="makeFilter">
+                    <option value="">Filter by Make</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Honda">Honda</option>
+                    <option value="Ford">Ford</option>
+                    <option value="BMW">BMW</option>
+                    <option value="Mercedes">Mercedes</option>
+                </select>
+
+                <select class="filter-select" id="yearFilter">
+                    <option value="">Filter by Year</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                </select>
+
+                <button class="btn btn-outline" id="resetFilters">
+                    <i class="fas fa-times"></i> Reset Filters
+                </button>
+            </div>
+
+            <div id="vehiclesContainer">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading your vehicles...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample vehicle data - This would come from your database
+        const vehiclesData = [
+            {
+                id: 1,
+                plate_number: "ABC-123",
+                make: "Toyota",
+                model: "Camry",
+                year: 2020,
+                color: "Blue",
+                mileage: 45000,
+                image_color: "linear-gradient(120deg, #f093fb 0%, #f5576c 100%)"
+            },
+            {
+                id: 2,
+                plate_number: "XYZ-789",
+                make: "Honda",
+                model: "Civic",
+                year: 2018,
+                color: "Red",
+                mileage: 62000,
+                image_color: "linear-gradient(120deg, #4facfe 0%, #00f2fe 100%)"
+            },
+            {
+                id: 3,
+                plate_number: "DEF-456",
+                make: "Ford",
+                model: "Mustang",
+                year: 2021,
+                color: "Black",
+                mileage: 15000,
+                image_color: "linear-gradient(120deg, #43e97b 0%, #38f9d7 100%)"
+            },
+            {
+                id: 4,
+                plate_number: "GHI-789",
+                make: "BMW",
+                model: "X5",
+                year: 2019,
+                color: "White",
+                mileage: 35000,
+                image_color: "linear-gradient(120deg, #fa709a 0%, #fee140 100%)"
+            }
+        ];
+
+        // Function to render vehicles
+        function renderVehicles(vehicles) {
+            const container = document.getElementById('vehiclesContainer');
+
+            if (vehicles.length === 0) {
+                container.innerHTML = `
+                    <div class="no-vehicles">
+                        <i class="fas fa-car"></i>
+                        <h3>No vehicles found</h3>
+                        <p>You haven't added any vehicles yet or no vehicles match your filters.</p>
+                        <button class="btn btn-primary" id="addVehicleEmptyBtn">
+                            <i class="fas fa-plus"></i> Add Your First Vehicle
+                        </button>
+                    </div>
+                `;
+
+                document.getElementById('addVehicleEmptyBtn').addEventListener('click', addVehicle);
+                return;
+            }
+
+            let html = '<div class="card-grid">';
+
+            vehicles.forEach(vehicle => {
+                html += `
+                    <div class="card" data-vehicle-id="${vehicle.id}">
+                        <div class="card-img" style="background: ${vehicle.image_color || 'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)'}">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>${vehicle.make} ${vehicle.model}</h3>
+                            <p><strong>Plate:</strong> ${vehicle.plate_number}</p>
+                            <p><strong>Year:</strong> ${vehicle.year} | <strong>Color:</strong> ${vehicle.color}</p>
+                            <p><strong>Mileage:</strong> ${vehicle.mileage.toLocaleString()} km</p>
+                            <div class="card-actions">
+                                <button class="btn btn-outline btn-sm view-details" data-id="${vehicle.id}">
+                                    <i class="fas fa-eye"></i> Details
+                                </button>
+                                <button class="btn btn-primary btn-sm manage-vehicle" data-id="${vehicle.id}">
+                                    <i class="fas fa-cog"></i> Manage
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // Add event listeners to buttons
+            document.querySelectorAll('.view-details').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const vehicleId = this.getAttribute('data-id');
+                    viewVehicleDetails(vehicleId);
+                });
+            });
+
+            document.querySelectorAll('.manage-vehicle').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const vehicleId = this.getAttribute('data-id');
+                    manageVehicle(vehicleId);
+                });
+            });
+        }
+
+        // Function to filter vehicles
+        function filterVehicles() {
+            const makeFilter = document.getElementById('makeFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+
+            let filteredVehicles = vehiclesData;
+
+            if (makeFilter) {
+                filteredVehicles = filteredVehicles.filter(vehicle => vehicle.make === makeFilter);
+            }
+
+            if (yearFilter) {
+                filteredVehicles = filteredVehicles.filter(vehicle => vehicle.year.toString() === yearFilter);
+            }
+
+            renderVehicles(filteredVehicles);
+        }
+
+        // Function to simulate adding a vehicle
+        function addVehicle() {
+            alert('This would open a form to add a new vehicle. In a real application, this would connect to your API endpoint.');
+        }
+
+        // Function to view vehicle details
+        function viewVehicleDetails(vehicleId) {
+            alert(`This would show details for vehicle ID: ${vehicleId}. In a real application, this would fetch data from your API.`);
+        }
+
+        // Function to manage vehicle
+        function manageVehicle(vehicleId) {
+            alert(`This would open management options for vehicle ID: ${vehicleId}. In a real application, this would connect to your API.`);
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate API loading delay
+            setTimeout(() => {
+                renderVehicles(vehiclesData);
+            }, 1000);
+
+            // Add event listeners
+            document.getElementById('addVehicleBtn').addEventListener('click', addVehicle);
+            document.getElementById('makeFilter').addEventListener('change', filterVehicles);
+            document.getElementById('yearFilter').addEventListener('change', filterVehicles);
+            document.getElementById('resetFilters').addEventListener('click', function() {
+                document.getElementById('makeFilter').value = '';
+                document.getElementById('yearFilter').value = '';
+                renderVehicles(vehiclesData);
+            });
+        });
+
+        // Function to fetch vehicles from your API (example)
+        async function fetchVehiclesFromAPI() {
+            try {
+                // This is an example of how you would connect to your actual API
+                /*
+                const response = await fetch('/users/vehicles/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer YOUR_ACCESS_TOKEN', // If using authentication
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch vehicles');
+                }
+
+                const vehicles = await response.json();
+                renderVehicles(vehicles);
+                */
+
+                // For demonstration, we're using the sample data
+                renderVehicles(vehiclesData);
+            } catch (error) {
+                console.error('Error fetching vehicles:', error);
+                document.getElementById('vehiclesContainer').innerHTML = `
+                    <div class="no-vehicles">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error loading vehicles</h3>
+                        <p>There was a problem loading your vehicles. Please try again later.</p>
+                        <button class="btn btn-primary" onclick="fetchVehiclesFromAPI()">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
