@@ -19,7 +19,6 @@ from fastapi.templating import Jinja2Templates
 from database import engine, Base
 import models
 
-
 # Create all tables
 Base.metadata.create_all(bind=engine)
 
@@ -38,7 +37,8 @@ from endpoints import (
     tolls,
     users,
     borrow,
-    email
+    email,
+    accidents
 )
 
 app.include_router(users.router, prefix="/api")
@@ -47,6 +47,8 @@ app.include_router(parking.router, prefix="/api")
 app.include_router(police.router, prefix="/api")
 app.include_router(registry.router, prefix="/api")
 app.include_router(tolls.router, prefix="/api")
+app.include_router(accidents.router, prefix="/api")
+
 # app.include_router(email.router, prefix="/api")
 
 

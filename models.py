@@ -2,6 +2,10 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Foreig
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Date
+from sqlalchemy.orm import relationship
+from database import Base
+from datetime import datetime
 
 
 class User(Base):
@@ -241,25 +245,6 @@ class TollKeypass(Base):
     transactions = relationship("TollTransaction", back_populates="keypass")
 
 
-# Fix the Accident model and add missing relationships
-'''class Accident(Base):
-    __tablename__ = "accidents"
-
-    id = Column(Integer, primary_key=True, index=True)
-    description = Column(String)
-    location = Column(String)
-    date_time = Column(DateTime, default=datetime.utcnow)
-    severity = Column(String)
-    photo_url = Column(String, nullable=True)
-    vehicle_id = Column(Integer, ForeignKey("vehicles.id"))
-    reported_by_id = Column(Integer, ForeignKey("registry_workers.id"))
-    vehicle_plate = Column(String, nullable=False)  # Add nullable=False
-
-    # Relationships
-    vehicle = relationship("Vehicle", back_populates="accidents")
-    reported_by = relationship("RegistryWorker", back_populates="reported_accidents")'''
-
-
 class Accident(Base):
     __tablename__ = "accidents"
 
@@ -284,6 +269,73 @@ class Accident(Base):
                 # You might need to handle this differently depending on your setup
                 pass
         super().__init__(**kwargs)
+
+
+class AccidentUser(Base):
+    __tablename__ = "accidentuser"
+
+    id = Column(Integer, primary_key=True, index=True)
+    description = Column(Text)
+    location = Column(String)
+    date_time = Column(DateTime, default=datetime.utcnow)
+    severity = Column(String)
+    police_docket_number = Column(String, unique=True, nullable=True)
+    status = Column(String, default="reported")
+    reported_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    at_fault_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+    # Relationships - FIXED back_populates references
+    reported_by = relationship("User", foreign_keys=[reported_by_id])
+    at_fault_user = relationship("User", foreign_keys=[at_fault_user_id])
+    vehicles = relationship("AccidentVehicle", back_populates="accident")
+    images = relationship("AccidentImage", back_populates="accident")
+    confirmations = relationship("AccidentConfirmation", back_populates="accident")
+
+
+class AccidentVehicle(Base):
+    __tablename__ = "accident_vehicles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    accident_id = Column(Integer, ForeignKey("accidentuser.id"))  # Fixed foreign key
+    vehicle_id = Column(Integer, ForeignKey("vehicles.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    license_plate = Column(String)
+    is_at_fault = Column(Boolean, default=False)
+
+    # Relationships - FIXED back_populates
+    accident = relationship("AccidentUser", back_populates="vehicles")
+    vehicle = relationship("Vehicle")
+    user = relationship("User")
+
+
+class AccidentImage(Base):
+    __tablename__ = "accident_images"
+
+    id = Column(Integer, primary_key=True, index=True)
+    accident_id = Column(Integer, ForeignKey("accidentuser.id"))  # Fixed foreign key
+    image_url = Column(String)
+    upload_timestamp = Column(DateTime, default=datetime.utcnow)
+    description = Column(String, nullable=True)
+
+    # Relationships - FIXED back_populates
+    accident = relationship("AccidentUser", back_populates="images")
+
+
+class AccidentConfirmation(Base):
+    __tablename__ = "accident_confirmations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    accident_id = Column(Integer, ForeignKey("accidentuser.id"))  # Fixed foreign key
+    user_id = Column(Integer, ForeignKey("users.id"))
+    vehicle_id = Column(Integer, ForeignKey("vehicles.id"))
+    confirmed = Column(Boolean, default=False)
+    confirmation_timestamp = Column(DateTime, nullable=True)
+    dispute_reason = Column(Text, nullable=True)
+
+    # Relationships - FIXED back_populates
+    accident = relationship("AccidentUser", back_populates="confirmations")
+    user = relationship("User")
+    vehicle = relationship("Vehicle")
 
 
 class RegistryWorker(Base):

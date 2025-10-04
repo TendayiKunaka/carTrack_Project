@@ -2,7 +2,7 @@ from operator import or_
 
 from sqlalchemy.orm import Session
 import models
-import schemas
+import schemas, schemas_accident
 from datetime import datetime, timedelta
 from auth import pwd_context, get_password_hash
 
@@ -1089,3 +1089,155 @@ def update_user_balance(db: Session, user_id: int, amount: float, transaction_ty
     db.commit()
     db.refresh(balance)
     return balance
+
+
+def generate_police_docket_number(db: Session):
+    """Generate a unique police docket number"""
+    from datetime import datetime
+    year = datetime.now().year
+    # Format: YEAR-RANDOM6DIGITS
+    import random
+    while True:
+        random_digits = random.randint(100000, 999999)
+        docket_number = f"{year}-{random_digits}"
+        # Check if unique
+        existing = db.query(models.AccidentUser).filter(
+            models.AccidentUser.police_docket_number == docket_number
+        ).first()
+        if not existing:
+            return docket_number
+
+
+def create_accident_report(db: Session, accident_data: schemas_accident.AccidentCreate, reported_by_id: int):
+    """Create a new accident report"""
+    try:
+        # Generate police docket number
+        docket_number = generate_police_docket_number(db)
+
+        # Create accident record
+        db_accident = models.AccidentUser(
+            description=accident_data.description,
+            location=accident_data.location,
+            severity=accident_data.severity,
+            police_docket_number=docket_number,
+            reported_by_id=reported_by_id,
+            status="reported"
+        )
+
+        db.add(db_accident)
+        db.flush()  # Flush to get the accident ID without committing
+
+        # Process vehicles involved
+        at_fault_user_id = None
+        for vehicle_data in accident_data.vehicles:
+            # Find the vehicle and its owner
+            vehicle = get_vehicle(db, vehicle_data.license_plate)
+            user_id = vehicle.user_id if vehicle else None
+
+            db_vehicle = models.AccidentVehicle(
+                accident_id=db_accident.id,
+                vehicle_id=vehicle.id if vehicle else None,
+                user_id=user_id,
+                license_plate=vehicle_data.license_plate,
+                is_at_fault=vehicle_data.is_at_fault
+            )
+
+            if vehicle_data.is_at_fault:
+                at_fault_user_id = user_id
+
+            db.add(db_vehicle)
+
+        # Set at-fault user
+        db_accident.at_fault_user_id = at_fault_user_id
+
+        # Add images
+        for image_data in accident_data.images:
+            db_image = models.AccidentImage(
+                accident_id=db_accident.id,
+                image_url=image_data.image_url,
+                description=image_data.description
+            )
+            db.add(db_image)
+
+        db.commit()
+        db.refresh(db_accident)
+
+        return db_accident
+
+    except Exception as e:
+        db.rollback()
+        raise e
+
+
+def get_accident_by_docket(db: Session, docket_number: str):
+    """Get accident by police docket number"""
+    return db.query(models.AccidentUser).filter(
+        models.AccidentUser.police_docket_number == docket_number
+    ).first()
+
+
+def get_user_accidents(db: Session, user_id: int):
+    """Get all accidents involving a user's vehicles"""
+    return db.query(models.AccidentUser).join(models.AccidentVehicle).filter(
+        models.AccidentVehicle.user_id == user_id
+    ).all()
+
+
+def create_accident_confirmation(db: Session, accident_id: int, user_id: int,
+                                 confirmation_data: schemas_accident.AccidentConfirmationCreate):
+    """Create accident confirmation from involved party"""
+    # Check if user has a vehicle in this accident
+    accident_vehicle = db.query(models.AccidentVehicle).filter(
+        models.AccidentVehicle.accident_id == accident_id,
+        models.AccidentVehicle.user_id == user_id
+    ).first()
+
+    if not accident_vehicle:
+        raise ValueError("User not involved in this accident")
+
+    # Create confirmation
+    db_confirmation = models.AccidentConfirmation(
+        accident_id=accident_id,
+        user_id=user_id,
+        vehicle_id=accident_vehicle.vehicle_id,
+        confirmed=confirmation_data.confirmed,
+        confirmation_timestamp=datetime.utcnow() if confirmation_data.confirmed else None,
+        dispute_reason=confirmation_data.dispute_reason
+    )
+
+    db.add(db_confirmation)
+    db.flush()
+
+    # Check if all parties have confirmed
+    update_accident_status(db, accident_id)
+
+    db.commit()
+    db.refresh(db_confirmation)
+    return db_confirmation
+
+
+def update_accident_status(db: Session, accident_id: int):
+    """Update accident status based on confirmations"""
+    accident = db.query(models.AccidentUser).filter(models.AccidentUser.id == accident_id).first()
+    if not accident:
+        return
+
+    # Get all vehicles involved
+    vehicles = db.query(models.AccidentVehicle).filter(
+        models.AccidentVehicle.accident_id == accident_id
+    ).all()
+
+    # Get all confirmations
+    confirmations = db.query(models.AccidentConfirmation).filter(
+        models.AccidentConfirmation.accident_id == accident_id
+    ).all()
+
+    # If all involved parties have confirmed and agreed
+    if len(confirmations) == len(vehicles):
+        all_agreed = all(conf.confirmed for conf in confirmations)
+        if all_agreed:
+            accident.status = "confirmed"
+        else:
+            accident.status = "disputed"
+
+    db.commit()
