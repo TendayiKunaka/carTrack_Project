@@ -30,6 +30,9 @@ class UserBase(BaseModel):
     full_name: constr(max_length=NAME_LENGTH)
     phone_number: constr(max_length=PHONE_LENGTH)
     email_notifications: bool = True
+    address: constr(max_length=NAME_LENGTH)
+    town: constr(max_length=NAME_LENGTH)
+    city: constr(max_length=NAME_LENGTH)
 
 
 class UserCreate(UserBase):

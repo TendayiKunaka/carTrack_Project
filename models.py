@@ -17,7 +17,9 @@ class User(Base):
     hashed_password = Column(String)
     full_name = Column(String)
     phone_number = Column(String)
-    balance = Column(Float, default=0.0)
+    address = Column(String)
+    town = Column(String)
+    city = Column(String)
     is_active = Column(Boolean, default=True)
     email_notifications = Column(Boolean, default=True)
 

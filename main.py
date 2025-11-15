@@ -38,16 +38,27 @@ from endpoints import (
     users,
     borrow,
     email,
-    accidents
+    accidents,
+    vehicle_search,
+    user_other,
+    customer_wallet,
+    user_car_management,
+    toll_management
 )
 
+app.include_router(vehicle_search.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
+app.include_router(customer_wallet.router, prefix="/api")
 app.include_router(borrow.router, prefix="/api")
+app.include_router(user_car_management.router, prefix="/api")
+app.include_router(accidents.router, prefix="/api")
+app.include_router(tolls.router, prefix="/api")
+app.include_router(toll_management.router, prefix="/api")
+app.include_router(user_other.router, prefix="/api")
 app.include_router(parking.router, prefix="/api")
 app.include_router(police.router, prefix="/api")
 app.include_router(registry.router, prefix="/api")
-app.include_router(tolls.router, prefix="/api")
-app.include_router(accidents.router, prefix="/api")
+
 
 # app.include_router(email.router, prefix="/api")
 
@@ -111,7 +122,7 @@ async def login_for_token(
     return {"access_token": access_token, "token_type": "bearer", "user_type": user_data["role"]}
 
 
-@app.post("/login", response_class=HTMLResponse, tags=["Authentication"])
+@app.post("/api/auth/login", response_class=HTMLResponse, tags=["Authentication"])
 async def login_for_web(
         request: Request,
         username: str = Form(...),
